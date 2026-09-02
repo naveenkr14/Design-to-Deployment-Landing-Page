@@ -1,8 +1,17 @@
 import { supabase } from './supabase.js';
 
 const EXPIRY_SKEW_SECONDS = 30;
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, '');
+const API_BASE_URL = configuredApiBaseUrl
+  ? (configuredApiBaseUrl.endsWith('/api') ? configuredApiBaseUrl : `${configuredApiBaseUrl}/api`)
+  : '/api';
 let refreshPromise = null;
 let authRedirectStarted = false;
+
+function apiUrl(path) {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+}
 
 function isExpiring(session) {
   return !session?.access_token || (
@@ -72,7 +81,7 @@ async function request(path, { method = 'GET', data } = {}) {
   }
 
   const body = data === undefined ? undefined : JSON.stringify(data);
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(apiUrl(path), {
     method,
     headers: headersForSession(session),
     body,
@@ -90,7 +99,7 @@ async function request(path, { method = 'GET', data } = {}) {
     throw asAuthError(error);
   }
 
-  const retryResponse = await fetch(`/api${path}`, {
+  const retryResponse = await fetch(apiUrl(path), {
     method,
     headers: headersForSession(refreshedSession),
     body,
