@@ -1,110 +1,22 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import Spinner from '../components/Spinner.jsx';
+import Icon from '../components/Icon.jsx';
 import { api } from '../lib/api.js';
 import { useAuth } from '../App.jsx';
+import { Alert, EmptyState, MetricCard, PageHeader } from '../components/UI.jsx';
 
 function NewProjectModal({ onClose, onCreated }) {
-  const [form, setForm] = useState({ name: '', client_name: '', deadline: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!form.name.trim()) { setError('Project name is required.'); return; }
-    setError(''); setLoading(true);
-    try {
-      const project = await api.post('/projects', { name: form.name.trim(), client_name: form.client_name || null, deadline: form.deadline || null });
-      onCreated(project);
-    } catch (err) {
-      setError(err.body?.upgrade ? err.message + ' Visit Pricing to upgrade.' : err.message || 'Failed.');
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(34,40,42,.45)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:500, padding:'1rem' }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="card" style={{ width:'100%', maxWidth:'480px', padding:'2rem' }}>
-        <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', fontWeight:600, marginBottom:'1.5rem' }}>New project</h2>
-        {error && <div style={{ background:'#fdf0ef', border:'1px solid #f5c0bb', borderRadius:6, padding:'.75rem 1rem', marginBottom:'1rem', fontSize:'.875rem', color:'#c0392b' }}>{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
-            <div className="form-group"><label className="form-label">Project name *</label><input type="text" required className="form-input" placeholder="Brand Identity v3" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
-            <div className="form-group"><label className="form-label">Client name</label><input type="text" className="form-input" placeholder="Sarah M." value={form.client_name} onChange={e => setForm(f => ({ ...f, client_name: e.target.value }))} /></div>
-            <div className="form-group"><label className="form-label">Review deadline</label><input type="date" className="form-input" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} /></div>
-            <div style={{ display:'flex', gap:'.75rem', marginTop:'.5rem' }}>
-              <button type="submit" className="btn btn-primary" style={{ flex:1 }} disabled={loading}>{loading ? 'Creating\u2026' : 'Create project'}</button>
-              <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+  const [form, setForm] = useState({ name: '', client_name: '', deadline: '' }); const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
+  async function handleSubmit(e) { e.preventDefault(); if (!form.name.trim()) { setError('Project name is required.'); return; } setError(''); setLoading(true); try { const project = await api.post('/projects', { name: form.name.trim(), client_name: form.client_name || null, deadline: form.deadline || null }); onCreated(project); } catch (err) { setError(err.body?.upgrade ? `${err.message} Visit Pricing to upgrade.` : err.message || 'Failed to create project.'); setLoading(false); } }
+  return <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose(); }}><div className="modal"><div className="modal__header"><div><h2>New project</h2><p>Start a focused client review.</p></div><button className="icon-button" type="button" onClick={onClose} aria-label="Close"><Icon name="close" size={17} /></button></div>{error && <Alert>{error}</Alert>}<form className="modal__form" onSubmit={handleSubmit}><div className="form-group"><label className="form-label" htmlFor="new-project-name">Project name</label><input id="new-project-name" type="text" required className="form-input" placeholder="Brand Identity v3" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div><div className="form-group"><label className="form-label" htmlFor="new-project-client">Client name <span className="muted">(optional)</span></label><input id="new-project-client" type="text" className="form-input" placeholder="Sarah M." value={form.client_name} onChange={e => setForm(f => ({ ...f, client_name: e.target.value }))} /></div><div className="form-group"><label className="form-label" htmlFor="new-project-deadline">Review deadline <span className="muted">(optional)</span></label><input id="new-project-deadline" type="date" className="form-input" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} /></div><div className="modal__actions"><button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button><button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Creating…' : 'Create project'}</button></div></form></div></div>;
 }
 
 export default function Dashboard() {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const { profile } = useAuth();
-  const upgraded = params.get('upgrade') === 'success';
-
+  const [projects, setProjects] = useState([]); const [loading, setLoading] = useState(true); const [showModal, setShowModal] = useState(false); const [query, setQuery] = useState(''); const navigate = useNavigate(); const [params] = useSearchParams(); const { profile } = useAuth(); const upgraded = params.get('upgrade') === 'success';
   useEffect(() => { api.get('/projects').then(setProjects).catch(() => {}).finally(() => setLoading(false)); }, []);
-
-  const statusOrder = { ready: 0, waiting: 1, approved: 2 };
-  const sorted = [...projects].sort((a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3));
-
-  return (
-    <Layout>
-      <div className="container" style={{ paddingBlock: 'clamp(2rem,5vw,3.5rem)' }}>
-        {upgraded && (
-          <div style={{ background:'#ecf7f0', border:'1px solid #a8d9b5', borderRadius:8, padding:'1rem 1.25rem', marginBottom:'1.5rem', display:'flex', alignItems:'center', gap:'.75rem' }}>
-            <span style={{ fontSize:'1.25rem' }}>{'\uD83C\uDF89'}</span>
-            <span style={{ fontSize:'.9375rem', color:'#1a6632', fontWeight:500 }}>Plan upgraded! You now have access to all {profile?.plan} features.</span>
-          </div>
-        )}
-
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'2rem', gap:'1rem', flexWrap:'wrap' }}>
-          <div>
-            <h1 style={{ fontFamily:'var(--font-display)', fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:600, letterSpacing:'-.02em' }}>Your Inbox</h1>
-            <p style={{ color:'var(--text-muted)', marginTop:'.25rem', fontSize:'.9375rem' }}>All your active client reviews in one place.</p>
-          </div>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ New project</button>
-        </div>
-
-        {loading ? (
-          <div style={{ display:'flex', justifyContent:'center', padding:'4rem' }}><Spinner size={32} /></div>
-        ) : sorted.length === 0 ? (
-          <div style={{ padding:'4rem 0', maxWidth:'540px' }}>
-            <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.6rem', fontWeight:600, marginBottom:'.75rem' }}>No projects yet</h2>
-            <p style={{ color:'var(--text-muted)', fontSize:'1rem', lineHeight:1.65, marginBottom:'1rem' }}>
-              <strong style={{ color:'var(--ink)' }}>Why Loop?</strong> Freelancers lose paid hours every week to feedback archaeology. Loop removes that entirely.
-            </p>
-            <button className="btn btn-primary" onClick={() => setShowModal(true)}>Create your first project</button>
-          </div>
-        ) : (
-          <div style={{ display:'flex', flexDirection:'column', background:'var(--white)', border:'var(--sage-line)', borderRadius:10, overflow:'hidden' }}>
-            {sorted.map((p, i) => (
-              <Link key={p.id} to={`/project/${p.id}`}
-                style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:'.375rem .75rem', padding:'1rem 1.25rem', borderBottom: i < sorted.length - 1 ? 'var(--sage-line)' : 'none', textDecoration:'none', color:'inherit', transition:'background .15s' }}
-                onMouseEnter={e => e.currentTarget.style.background='#fafaf8'} onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-                <span style={{ fontWeight:600, fontSize:'.9375rem' }}>{p.name}</span>
-                <StatusBadge status={p.status} />
-                <span style={{ fontSize:'.8125rem', color:'var(--text-muted)', gridColumn:1 }}>
-                  {p.client_name && `${p.client_name} \u00B7 `}{p.files?.length || 0} file{p.files?.length !== 1 ? 's' : ''}
-                </span>
-                {p.deadline && <span style={{ fontSize:'.75rem', color:'var(--text-subtle)', gridColumn:1 }}>Due: {new Date(p.deadline).toLocaleDateString('en-US', { month:'short', day:'numeric' })}</span>}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-      {showModal && <NewProjectModal onClose={() => setShowModal(false)} onCreated={p => { setShowModal(false); navigate(`/project/${p.id}`); }} />}
-    </Layout>
-  );
+  const sorted = [...projects].sort((a, b) => ({ ready: 0, waiting: 1, approved: 2 }[a.status] ?? 3) - ({ ready: 0, waiting: 1, approved: 2 }[b.status] ?? 3)); const filtered = sorted.filter(project => `${project.name} ${project.client_name || ''}`.toLowerCase().includes(query.toLowerCase())); const waiting = projects.filter(p => p.status === 'waiting').length; const approved = projects.filter(p => p.status === 'approved').length; const files = projects.reduce((total, project) => total + (project.files?.length || 0), 0);
+  return <Layout><div className="page"><PageHeader eyebrow="Workspace overview" title="Good morning, let’s ship." description="A focused view of your active client reviews and the work that needs your attention today." actions={<button className="btn btn-primary" onClick={() => setShowModal(true)}><Icon name="plus" size={15} />New project</button>} />{upgraded && <div style={{ marginBottom: 18 }}><Alert tone="success">Plan upgraded. You now have access to your {profile?.plan || 'new'} plan features.</Alert></div>}<div className="metric-grid"><MetricCard icon="folder" label="Total projects" value={projects.length} detail={projects.length ? 'Across workspace' : 'Ready when you are'} /><MetricCard icon="clock" label="Awaiting feedback" value={waiting} detail={waiting ? 'Needs a nudge' : 'All clear'} tone="amber" /><MetricCard icon="circleCheck" label="Approved reviews" value={approved} detail={files ? `${files} files reviewed` : 'No approvals yet'} tone="green" /><MetricCard icon="sparkle" label="Current plan" value={profile?.plan || 'Free'} detail="14-day trial included" tone="cyan" /></div><div className="dashboard-grid"><section className="panel"><div className="panel__header"><div><div className="panel__title">Recent projects</div><div className="panel__subtitle">Your review pipeline, sorted by what needs attention.</div></div><Link className="btn btn-ghost btn-sm" to="/dashboard">View all <Icon name="arrowRight" size={13} /></Link></div><div className="table-toolbar"><label className="table-toolbar__search"><Icon name="search" size={15} /><input aria-label="Filter projects" placeholder="Filter projects..." value={query} onChange={e => setQuery(e.target.value)} /></label><span className="muted" style={{ fontSize: 11 }}>{filtered.length} shown</span></div>{loading ? <div className="empty-state"><Spinner size={28} color="var(--violet-bright)" /></div> : filtered.length === 0 ? <EmptyState icon={query ? 'search' : 'folder'} title={query ? 'No matching projects' : 'Your workspace is ready'} description={query ? 'Try a different name or client.' : 'Create your first project to turn scattered feedback into a clear approval thread.'} action={!query && <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}><Icon name="plus" size={14} />Create first project</button>} /> : filtered.map(project => <Link className="table-row" key={project.id} to={`/project/${project.id}`}><div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}><span className="project-icon"><Icon name="folder" size={16} /></span><div style={{ minWidth: 0 }}><div className="table-row__title">{project.name}</div><div className="table-row__meta">{project.client_name || 'No client assigned'} · {project.files?.length || 0} file{project.files?.length === 1 ? '' : 's'}</div></div></div><StatusBadge status={project.status} /><div className="table-row__right">{project.deadline ? `Due ${new Date(project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'No deadline'}</div><Icon name="chevron" size={15} /></Link>)}</section><aside className="side-stack"><section className="panel"><div className="panel__header"><div><div className="panel__title">Quick actions</div><div className="panel__subtitle">Keep your workflow moving.</div></div></div><div className="panel__body" style={{ paddingTop: 8, paddingBottom: 8 }}><button className="quick-action" type="button" onClick={() => setShowModal(true)}><span className="quick-action__icon"><Icon name="plus" size={15} /></span>Start a new project<Icon name="chevron" size={14} style={{ marginLeft: 'auto' }} /></button><Link className="quick-action" to="/pricing"><span className="quick-action__icon"><Icon name="sparkle" size={15} /></span>Explore plans<Icon name="chevron" size={14} style={{ marginLeft: 'auto' }} /></Link><Link className="quick-action" to="/settings"><span className="quick-action__icon"><Icon name="settings" size={15} /></span>Workspace settings<Icon name="chevron" size={14} style={{ marginLeft: 'auto' }} /></Link></div></section><section className="panel"><div className="panel__body"><div className="panel__title">Workspace health</div><div className="panel__subtitle" style={{ marginBottom: 17 }}>A simple pulse of your review flow.</div><div style={{ display: 'flex', alignItems: 'end', gap: 5, height: 74, marginBottom: 14 }}>{[22, 36, 31, 48, 42, 61, 55, 73, 68, 83, 77, 91].map((height, index) => <span key={index} style={{ flex: 1, height: `${height}%`, borderRadius: 3, background: index > 8 ? 'linear-gradient(var(--violet), var(--cyan))' : 'var(--surface-3)' }} />)}</div><div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-subtle)', fontSize: 10 }}><span>Last 12 weeks</span><span style={{ color: 'var(--green)' }}>Live data</span></div></div></section></aside></div></div>{showModal && <NewProjectModal onClose={() => setShowModal(false)} onCreated={project => { setShowModal(false); navigate(`/project/${project.id}`); }} />}</Layout>;
 }

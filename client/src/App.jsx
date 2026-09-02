@@ -7,6 +7,8 @@ import Spinner from './components/Spinner.jsx';
 import Landing    from './pages/Landing.jsx';
 import Login      from './pages/Login.jsx';
 import Signup     from './pages/Signup.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 import Onboarding from './pages/Onboarding.jsx';
 import Dashboard  from './pages/Dashboard.jsx';
 import Project    from './pages/Project.jsx';
@@ -75,7 +77,7 @@ function AuthProvider({ children }) {
 
   if (session === undefined) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:'#F6F5F1' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:'#090b11' }}>
         <Spinner size={36} />
       </div>
     );
@@ -110,8 +112,11 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/login"   element={<RequireGuest><Login /></RequireGuest>} />
           <Route path="/signup"  element={<RequireGuest><Signup /></RequireGuest>} />
+          <Route path="/forgot-password" element={<RequireGuest><ForgotPassword /></RequireGuest>} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
           <Route path="/dashboard"  element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/projects"   element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/project/:id" element={<RequireAuth><Project /></RequireAuth>} />
           <Route path="/settings"   element={<RequireAuth><Settings /></RequireAuth>} />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,0 +1,37 @@
+const ICONS = {
+  activity: <><path d="M3 12h4l2-7 4 14 2-7h6" /></>,
+  arrowDown: <><path d="m6 9 6 6 6-6" /></>,
+  arrowLeft: <><path d="m15 18-6-6 6-6" /></>,
+  arrowRight: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
+  bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></>,
+  chart: <><path d="M4 19V5M4 19h16" /><path d="m7 15 3-4 3 2 5-7" /></>,
+  check: <><path d="m5 12 4 4L19 6" /></>,
+  chevron: <><path d="m9 18 6-6-6-6" /></>,
+  circleCheck: <><circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" /></>,
+  clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+  close: <><path d="m6 6 12 12M18 6 6 18" /></>,
+  code: <><path d="m8 9-3 3 3 3M16 9l3 3-3 3M14 5l-4 14" /></>,
+  dots: <><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></>,
+  external: <><path d="M14 5h5v5M19 5l-8 8" /><path d="M18 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></>,
+  folder: <><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" /></>,
+  grid: <><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><rect x="14" y="14" width="6" height="6" rx="1" /></>,
+  help: <><circle cx="12" cy="12" r="9" /><path d="M9.7 9a2.5 2.5 0 1 1 4.3 1.8c-.9.9-2 1.2-2 2.7M12 17h.01" /></>,
+  layers: <><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5M3 16l9 5 9-5" /></>,
+  link: <><path d="M10 13.5a4 4 0 0 0 5.7.1l2-2a4 4 0 0 0-5.7-5.7l-1.1 1.1" /><path d="M14 10.5a4 4 0 0 0-5.7-.1l-2 2A4 4 0 0 0 12 18.1l1.1-1.1" /></>,
+  lock: <><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" /></>,
+  logout: <><path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4M14 8l4 4-4 4M18 12H9" /></>,
+  menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
+  plus: <><path d="M12 5v14M5 12h14" /></>,
+  search: <><circle cx="10.8" cy="10.8" r="6.3" /><path d="m16 16 4 4" /></>,
+  settings: <><circle cx="12" cy="12" r="3.5" /><path d="M19 12a7 7 0 0 0-.1-1.1l1.3-1a1 1 0 0 0 .2-1.4l-1.2-1.6a1 1 0 0 0-1.4-.2l-1.4.8a7 7 0 0 0-1.9-1.1l-.2-1.6a1 1 0 0 0-1-.8h-2a1 1 0 0 0-1 .8l-.2 1.6a7 7 0 0 0-1.9 1.1l-1.4-.8a1 1 0 0 0-1.4.2L4.2 8.5a1 1 0 0 0 .2 1.4l1.3 1A7 7 0 0 0 5.6 12a7 7 0 0 0 .1 1.1l-1.3 1a1 1 0 0 0-.2 1.4l1.2 1.6a1 1 0 0 0 1.4.2l1.4-.8a7 7 0 0 0 1.9 1.1l1.9 1.1.2 1.6a1 1 0 0 0 1 .8h2a1 1 0 0 0 1-.8l.2-1.6a7 7 0 0 0 1.9-1.1l1.4.8a1 1 0 0 0 1.4-.2l1.2-1.6a1 1 0 0 0-.2-1.4l-1.3-1A7 7 0 0 0 19 12Z" transform="translate(-2 -2)" /></>,
+  shield: <><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z" /><path d="m9 12 2 2 4-4" /></>,
+  sparkle: <><path d="m12 3 1.3 5.7L19 10l-5.7 1.3L12 17l-1.3-5.7L5 10l5.7-1.3L12 3ZM19 16l.5 2.5L22 19l-2.5.5L19 22l-.5-2.5L16 19l2.5-.5L19 16Z" /></>,
+  upload: <><path d="M12 16V4M8 8l4-4 4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" /></>,
+  user: <><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
+  users: <><circle cx="9" cy="8" r="3" /><path d="M3 20a6 6 0 0 1 12 0M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 4 5" /></>,
+  zap: <><path d="m13 2-9 11h7l-1 9 9-12h-7l1-8Z" /></>,
+};
+
+export default function Icon({ name, size = 18, strokeWidth = 1.8, className = '', style }) {
+  return <svg className={className} style={style} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS[name] || ICONS.sparkle}</svg>;
+}
