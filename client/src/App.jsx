@@ -14,6 +14,8 @@ import Dashboard  from './pages/Dashboard.jsx';
 import Project    from './pages/Project.jsx';
 import Settings   from './pages/Settings.jsx';
 import Pricing    from './pages/Pricing.jsx';
+import NotFound   from './pages/NotFound.jsx';
+import { Analytics, Deployments, Logs, Domains, EnvironmentVariables, Integrations, Team, Notifications, Activity, Security, Developer, Billing } from './pages/FeaturePages.jsx';
 
 const AuthCtx = createContext(null);
 export const useAuth = () => useContext(AuthCtx);
@@ -119,7 +121,19 @@ export default function App() {
           <Route path="/projects"   element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/project/:id" element={<RequireAuth><Project /></RequireAuth>} />
           <Route path="/settings"   element={<RequireAuth><Settings /></RequireAuth>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/deployments" element={<RequireAuth><Deployments /></RequireAuth>} />
+          <Route path="/logs" element={<RequireAuth><Logs /></RequireAuth>} />
+          <Route path="/analytics" element={<RequireAuth><Analytics /></RequireAuth>} />
+          <Route path="/domains" element={<RequireAuth><Domains /></RequireAuth>} />
+          <Route path="/environment-variables" element={<RequireAuth><EnvironmentVariables /></RequireAuth>} />
+          <Route path="/integrations" element={<RequireAuth><Integrations /></RequireAuth>} />
+          <Route path="/team" element={<RequireAuth><Team /></RequireAuth>} />
+          <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
+          <Route path="/activity" element={<RequireAuth><Activity /></RequireAuth>} />
+          <Route path="/security" element={<RequireAuth><Security /></RequireAuth>} />
+          <Route path="/developer" element={<RequireAuth><Developer /></RequireAuth>} />
+          <Route path="/billing" element={<RequireAuth><Billing /></RequireAuth>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

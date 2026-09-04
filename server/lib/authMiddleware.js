@@ -1,5 +1,12 @@
 ﻿import { createClient } from '@supabase/supabase-js';
 
+function isAuthTransportError(error) {
+  return error?.name === 'AuthRetryableFetchError'
+    || error?.status === 0
+    || error?.code === 'EACCES'
+    || error?.message === 'fetch failed';
+}
+
 // Verifies the Supabase JWT from Authorization: Bearer <token>
 export async function requireAuth(req, res, next) {
   const authorization = req.headers.authorization || '';
@@ -14,7 +21,20 @@ export async function requireAuth(req, res, next) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  const { data: { user }, error } = await supabase.auth.getUser(token);
+  let result;
+  try {
+    result = await supabase.auth.getUser(token);
+  } catch (error) {
+    if (isAuthTransportError(error)) {
+      return res.status(503).json({ error: 'Authentication service temporarily unavailable' });
+    }
+    return next(error);
+  }
+
+  const { data: { user } = {}, error } = result;
+  if (isAuthTransportError(error)) {
+    return res.status(503).json({ error: 'Authentication service temporarily unavailable' });
+  }
   if (error || !user) return res.status(401).json({ error: 'Invalid or expired token' });
 
   req.user = user;
