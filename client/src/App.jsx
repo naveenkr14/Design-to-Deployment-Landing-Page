@@ -15,6 +15,7 @@ import Project    from './pages/Project.jsx';
 import Settings   from './pages/Settings.jsx';
 import Pricing    from './pages/Pricing.jsx';
 import NotFound   from './pages/NotFound.jsx';
+import { AboutLoop, Guidelines } from './pages/InfoPages.jsx';
 import { Analytics, Deployments, Logs, Domains, EnvironmentVariables, Integrations, Team, Notifications, Activity, Security, Developer, Billing } from './pages/FeaturePages.jsx';
 
 const AuthCtx = createContext(null);
@@ -118,6 +119,8 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
           <Route path="/dashboard"  element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/about-loop" element={<RequireAuth><AboutLoop /></RequireAuth>} />
+          <Route path="/guidelines" element={<RequireAuth><Guidelines /></RequireAuth>} />
           <Route path="/projects"   element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/project/:id" element={<RequireAuth><Project /></RequireAuth>} />
           <Route path="/settings"   element={<RequireAuth><Settings /></RequireAuth>} />

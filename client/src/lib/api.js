@@ -80,10 +80,11 @@ async function request(path, { method = 'GET', data } = {}) {
     throw asAuthError(error);
   }
 
-  const body = data === undefined ? undefined : JSON.stringify(data);
+  const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+  const body = data === undefined ? undefined : isFormData ? data : JSON.stringify(data);
   const response = await fetch(apiUrl(path), {
     method,
-    headers: headersForSession(session),
+    headers: headersForSession(session, !isFormData),
     body,
   });
 
@@ -101,7 +102,7 @@ async function request(path, { method = 'GET', data } = {}) {
 
   const retryResponse = await fetch(apiUrl(path), {
     method,
-    headers: headersForSession(refreshedSession),
+    headers: headersForSession(refreshedSession, !isFormData),
     body,
   });
 
@@ -114,6 +115,7 @@ async function request(path, { method = 'GET', data } = {}) {
 export const api = {
   async get(path) { return request(path); },
   async post(path, data) { return request(path, { method: 'POST', data }); },
+  async upload(path, formData) { return request(path, { method: 'POST', data: formData }); },
   async patch(path, data) { return request(path, { method: 'PATCH', data }); },
   async del(path) { return request(path, { method: 'DELETE' }); },
 };

@@ -1,0 +1,16 @@
+import { Link } from 'react-router-dom';
+import Layout from '../components/Layout.jsx';
+import Icon from '../components/Icon.jsx';
+import { PageHeader } from '../components/UI.jsx';
+
+function InfoCard({ icon, number, title, children }) {
+  return <article className="info-card"><div className="info-card__icon"><Icon name={icon} size={18} /></div>{number && <span className="info-card__number">{number}</span>}<h2>{title}</h2><p>{children}</p></article>;
+}
+
+export function AboutLoop() {
+  return <Layout><div className="page"><PageHeader eyebrow="About Loop" title="A calmer way to get to yes." description="Loop keeps client files, precise feedback, and final approvals together in one focused workspace." actions={<Link className="btn btn-primary btn-sm" to="/guidelines"><Icon name="help" size={14} />Read the guidelines</Link>} /><div className="info-hero panel"><div><span className="eyebrow"><span className="eyebrow__dot" />The Loop approach</span><h2>Turn scattered reactions into a clear review thread.</h2><p>Share a file, give every note a precise place, and keep the next decision visible to everyone involved. Loop is built for creative teams who want momentum without adding another noisy inbox.</p></div><div className="info-hero__signal"><span>FILE</span><strong>→</strong><span>FEEDBACK</span><strong>→</strong><span>APPROVAL</span></div></div><div className="info-grid"><InfoCard icon="upload" title="Share the work">Upload the design or PDF your client needs to review, then keep every version attached to the project.</InfoCard><InfoCard icon="activity" title="Keep context">Pin feedback directly to the exact place on the file so “top right” never becomes a guessing game.</InfoCard><InfoCard icon="circleCheck" title="Close the loop">Mark a review approved when the decision is final and give the whole team a dependable source of truth.</InfoCard></div></div></Layout>;
+}
+
+export function Guidelines() {
+  return <Layout><div className="page"><PageHeader eyebrow="Guidelines" title="How to use Loop" description="A short path from your first project to a clear client approval." actions={<Link className="btn btn-secondary btn-sm" to="/dashboard"><Icon name="arrowLeft" size={14} />Back to overview</Link>} /><div className="info-grid info-grid--steps"><InfoCard icon="plus" number="01" title="Create a project">Name the project, add an optional client, and set a review deadline if one matters.</InfoCard><InfoCard icon="upload" number="02" title="Upload a file">Open the project and drop in a PNG, JPG, WebP, or PDF. The file becomes the shared review surface.</InfoCard><InfoCard icon="activity" number="03" title="Pin feedback">Click the exact spot that needs attention, write a note, and keep the conversation attached to the work.</InfoCard><InfoCard icon="circleCheck" number="04" title="Approve the review">When the client is happy, mark the project approved so the final decision is easy to find later.</InfoCard></div><div className="panel info-callout"><div className="quick-action__icon"><Icon name="help" size={17} /></div><div><strong>Keep the review thread focused</strong><p>Use one project per client deliverable and upload a new version when the work changes. This keeps comments and approvals in the right context.</p></div></div></div></Layout>;
+}

@@ -10,13 +10,16 @@ import { api } from '../lib/api.js';
 import { supabase } from '../lib/supabase.js';
 import { useAuth } from '../App.jsx';
 
-async function uploadToStorage(file, projectId) {
-  const ext = file.name.split('.').pop(); const path = `${projectId}/${Date.now()}.${ext}`; const { data, error } = await supabase.storage.from('files').upload(path, file, { upsert: false }); if (error) throw error; const { data: { publicUrl } } = supabase.storage.from('files').getPublicUrl(data.path); return { url: publicUrl, name: file.name };
+async function uploadFile(file, projectId) {
+  const formData = new FormData();
+  formData.append('project_id', projectId);
+  formData.append('file', file);
+  return api.upload('/files/upload', formData);
 }
 
 function UploadZone({ projectId, onUploaded }) {
   const [dragging, setDragging] = useState(false); const [uploading, setUploading] = useState(false); const [err, setErr] = useState(''); const inputRef = useRef();
-  async function handleFiles(files) { const file = files[0]; if (!file) return; setErr(''); setUploading(true); try { const { url, name } = await uploadToStorage(file, projectId); const record = await api.post('/files', { project_id: projectId, file_url: url, file_name: name }); onUploaded(record); } catch (error) { setErr(error.message || 'Upload failed.'); } finally { setUploading(false); } }
+  async function handleFiles(files) { const file = files[0]; if (!file) return; setErr(''); setUploading(true); try { const record = await uploadFile(file, projectId); onUploaded(record); } catch (error) { setErr(error.message || 'Upload failed.'); } finally { setUploading(false); } }
   return <div className="upload-zone" role="button" tabIndex="0" onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click(); }} onClick={() => inputRef.current?.click()} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files); }} style={dragging ? { borderColor: 'var(--violet)', background: 'var(--violet-soft)' } : undefined}><input ref={inputRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={e => handleFiles(e.target.files)} />{uploading ? <><Spinner size={28} color="var(--violet-bright)" /><p>Uploading file…</p></> : <><span className="upload-zone__icon"><Icon name="upload" size={20} /></span><strong>Drop a file here, or browse</strong><p>Images (PNG, JPG, WebP) or PDFs</p>{err && <p style={{ color: 'var(--red)' }}>{err}</p>}</>}</div>;
 }
 
